@@ -2,36 +2,48 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { db } from '../firebaseConfig';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 export default function Admin() {
   const [user, setUser] = useState(null);
   const [trendingTopics, setTrendingTopics] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const emailToFind = 'krutiventi@gmail.com'; // Email to search for
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [isLoadingTopics, setIsLoadingTopics] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const usersCollection = collection(db, 'users');
-        const q = query(usersCollection, where('email', '==', emailToFind));
-        const userSnapshot = await getDocs(q);
-        
-        if (!userSnapshot.empty) {
-          const userData = userSnapshot.docs[0].data();
-          setUser({ id: userSnapshot.docs[0].id, ...userData });
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("Error fetching user: ", error);
-      }
-    };
+    // Check the current logged-in user
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        try {
+          const usersCollection = collection(db, 'users');
+          const q = query(usersCollection, where('email', '==', currentUser.email));
+          const userSnapshot = await getDocs(q);
 
-    fetchUser();
+          if (!userSnapshot.empty) {
+            const userData = userSnapshot.docs[0].data();
+            setUser({ id: userSnapshot.docs[0].id, ...userData });
+          } else {
+            setUser(null);
+          }
+        } catch (error) {
+          console.error("Error fetching user: ", error);
+        } finally {
+          setIsLoadingUser(false);
+        }
+      } else {
+        setUser(null);
+        setIsLoadingUser(false);
+      }
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (user && user.interests) {
+      setIsLoadingTopics(true);
       const fetchTrendingTopics = async () => {
         try {
           const response = await axios.post('http://localhost:5000/api/trending', { interests: user.interests });
@@ -39,19 +51,21 @@ export default function Admin() {
         } catch (error) {
           console.error("Error fetching trending topics: ", error);
         } finally {
-          setIsLoading(false);
+          setIsLoadingTopics(false);
         }
       };
 
       fetchTrendingTopics();
+    } else {
+      setIsLoadingTopics(false);
     }
   }, [user]);
 
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-2xl font-bold text-[#FF3C2F]">Admin - User Details</h1>
-      {isLoading ? (
-        <p className="text-[#FFFFFF]">Loading data...</p>
+      {isLoadingUser ? (
+        <p className="text-[#FFFFFF]">Loading user data...</p>
       ) : (
         <div>
           {user ? (
@@ -61,23 +75,34 @@ export default function Admin() {
               <p className="text-[#FFFFFF]"><strong>Interests:</strong> {user.interests ? user.interests.join(', ') : 'No interests selected'}</p>
             </div>
           ) : (
-            <p className="text-[#FFFFFF]">No user found with the email {emailToFind}.</p>
+            <p className="text-[#FFFFFF]">Please log in to view your trending topics.</p>
           )}
 
-          <h2 className="text-2xl font-bold text-[#FF3C2F] mt-8">Trending Topics</h2>
-          <div className="mt-4">
-            {trendingTopics.length === 0 ? (
-              <p className="text-[#FFFFFF]">No trending topics found.</p>
-            ) : (
-              trendingTopics.map((topic, index) => (
-                <div key={index} className="bg-[#2A2A2A] p-4 rounded-lg shadow-md mt-4">
-                  <h3 className="text-[#FF3C2F] font-semibold">Interest: {topic.interest}</h3>
-                  <a href={topic.url} target="_blank" rel="noopener noreferrer" className="text-[#FF3C2F]">Source</a>
-                  <p className="text-[#FFFFFF] mt-2">{topic.content}</p>
+          {user && (
+            <>
+              <h2 className="text-2xl font-bold text-[#FF3C2F] mt-8">Trending Topics</h2>
+              {isLoadingTopics ? (
+                <p className="text-[#FFFFFF]">Loading trending topics...</p>
+              ) : (
+                <div className="mt-4">
+                  {trendingTopics.length === 0 ? (
+                    <p className="text-[#FFFFFF]">No trending topics found.</p>
+                  ) : (
+                    trendingTopics.map((topic, index) => (
+                      <div key={index} className="bg-[#2A2A2A] p-4 rounded-lg shadow-md mt-4">
+                        <h3 className="text-[#FF3C2F] font-semibold">Interest: {topic.interest}</h3>
+                        <a href={topic.url} target="_blank" rel="noopener noreferrer" className="text-[#FF3C2F]">Source</a>
+                        <div
+                          className="text-[#FFFFFF] mt-2"
+                          dangerouslySetInnerHTML={{ __html: topic.content }}
+                        ></div>
+                      </div>
+                    ))
+                  )}
                 </div>
-              ))
-            )}
-          </div>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>

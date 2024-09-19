@@ -88,6 +88,8 @@ def search_api():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+# Add your NewsAPI key here
+NEWS_API_KEY = '122988a817164c2eb54fedd9940d3307'
 
 @app.route('/api/trending', methods=['POST'])
 def trending_topics():
@@ -99,38 +101,43 @@ def trending_topics():
 
     try:
         trending_topics = []
-        
+
         for interest in interests:
-            refined_questions = refine_query_with_gemini(interest)
             count = 0  # Counter to limit the number of topics per interest
 
-            for refined_query in refined_questions:
-                if count >= 2:
-                    break  # Stop if we already have 2 topics for this interest
-                
-                urls = perform_duckduckgo_search(refined_query, num_results=3)
-                for url in urls:
+            # Use the NewsAPI to search for the latest news articles related to the interest
+            news_url = f'https://newsapi.org/v2/everything?q={interest}&sortBy=publishedAt&apiKey={NEWS_API_KEY}'
+            response = requests.get(news_url)
+
+            if response.status_code == 200:
+                news_data = response.json()
+                articles = news_data.get('articles', [])
+
+                # Limit to 2 articles per interest
+                for article in articles:
                     if count >= 2:
-                        break  # Stop if we already have 2 topics for this interest
+                        break
                     
-                    content = scrape_content(url)
-                    if content:
-                        summarized_content = summarize_content_with_gemini(content)
-                        trending_topics.append({
-                            'interest': interest,
-                            'url': url,
-                            'content': summarized_content
-                        })
-                        count += 1  # Increment the counter
+                    # Summarize the content if needed, or directly use the description from the article
+                    summarized_content = summarize_content_with_gemini(article.get('description', ''))
+
+                    trending_topics.append({
+                        'interest': interest,
+                        'url': article.get('url', ''),
+                        'content': summarized_content
+                    })
+                    count += 1
+            else:
+                print(f"Error fetching news for {interest}: {response.status_code}")
 
         return jsonify({'trending_topics': trending_topics})
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+    
 def summarize_content_with_gemini(content):
     prompt = f"""
-    Summarize the following content, focusing on the main points and excluding any advertisements or irrelevant information:
+    Summarize the following content give 3-4 lines, focusing on the main points and excluding any advertisements or irrelevant information:
 
     {content}
     """
