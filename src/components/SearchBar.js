@@ -24,7 +24,7 @@ export default function SearchBar() {
           setSources([]);
         } else {
           setResult(data.answer);
-          setSources(data.sources);
+          setSources(data.sources.slice(0, 6)); // Show only top 6 sources
         }
         setIsLoading(false);
       })
@@ -36,7 +36,7 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="flex flex-col items-center py-6 px-4  bg-black text-white">
+    <div className="flex flex-col items-center py-6 px-4 bg-black text-white">
       <h1 className="text-4xl font-bold mb-8 text-[#FF3C2F]">AI-Powered Search</h1>
       <div className="flex w-full max-w-4xl bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <input
@@ -54,27 +54,38 @@ export default function SearchBar() {
           {isLoading ? <Loader className="animate-spin" /> : <><Search className="mr-2" /> Search</>}
         </button>
       </div>
+
       <div className="mt-8 p-6 w-full max-w-4xl bg-gray-900 rounded-lg shadow-xl border border-gray-800">
         {result ? (
           <>
             <h2 className="text-2xl font-semibold mb-4 text-[#FF3C2F]">Search Results</h2>
-            <div className="prose prose-invert max-w-none mb-6">
-              <ReactMarkdown>{result}</ReactMarkdown>
+            <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg mb-6">
+            <div className="prose prose-invert max-w-none mb-6 leading-relaxed space-y-4 text-left">
+
+                {/* Nicely spaced paragraphs */}
+                <ReactMarkdown>{result}</ReactMarkdown>
+              </div>
             </div>
+
             {sources.length > 0 && (
-              <div>
-                <h3 className="text-xl font-semibold mb-2 text-[#FF3C2F]">Sources:</h3>
-                <ul className="list-disc list-inside">
+              <>
+                <h3 className="text-xl font-semibold mb-4 text-[#FF3C2F]">Top Sources:</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {sources.map((source, index) => (
-                    <li key={index} className="mb-1">
-                      <a href={source} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 flex items-center">
-                        {source.length > 50 ? source.substring(0, 50) + '...' : source}
+                    <div key={index} className="bg-gray-800 border border-gray-700 p-4 rounded-lg hover:shadow-lg transition duration-300">
+                      <a
+                        href={source}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300 flex items-center"
+                      >
+                        {`Source ${index + 1}`}
                         <ExternalLink className="ml-1 w-4 h-4" />
                       </a>
-                    </li>
+                    </div>
                   ))}
-                </ul>
-              </div>
+                </div>
+              </>
             )}
           </>
         ) : (

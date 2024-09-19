@@ -63,7 +63,7 @@ export default function Admin() {
 
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-2xl font-bold text-[#FF3C2F]">Admin - User Details</h1>
+      <h1 className="text-2xl font-bold text-[#FF3C2F]">Profile</h1>
       {isLoadingUser ? (
         <p className="text-[#FFFFFF]">Loading user data...</p>
       ) : (
@@ -80,9 +80,9 @@ export default function Admin() {
 
           {user && (
             <>
-              <h2 className="text-2xl font-bold text-[#FF3C2F] mt-8">Trending Topics</h2>
+              <h2 className="text-2xl font-bold text-[#FF3C2F] mt-8">Interest Related News</h2>
               {isLoadingTopics ? (
-                <p className="text-[#FFFFFF]">Loading trending topics...</p>
+                <p className="text-[#FFFFFF]">Loading interest related news...</p>
               ) : (
                 <div className="mt-4">
                   {trendingTopics.length === 0 ? (
