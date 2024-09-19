@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import LoginRegisterModal from './components/LoginRegisterModal';
 import { auth } from './firebaseConfig';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
+import Trending from './pages/Trending';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -30,6 +31,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path='/trending' element={<Trending/>}/>
           </Routes>
         </div>
         <Footer />
