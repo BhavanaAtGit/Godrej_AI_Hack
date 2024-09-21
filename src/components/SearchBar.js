@@ -10,7 +10,7 @@ export default function SearchBar() {
 
   const handleSearch = () => {
     setIsLoading(true);
-    fetch('http://127.0.0.1:5000/api/search', {
+    fetch('https://godrej-ai-hack.onrender.com/api/search', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

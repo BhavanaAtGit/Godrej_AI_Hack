@@ -32,7 +32,7 @@ function App() {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/profile" element={<Trending />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path='/trending' element={<Trending/>}/>
             <Route path="/" element={<TrendingTopics />} />
             <Route path="/news/:topic" element={<NewsSummary />} />

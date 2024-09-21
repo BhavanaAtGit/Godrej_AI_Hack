@@ -56,27 +56,6 @@ export default function Home() {
         <TrendingTopics />
       </div>
 
-      {/* Testimonials Section */}
-      <div className="bg-[#1A1A1A] text-center py-12 mt-12">
-        <div className="container mx-auto px-8">
-          <h2 className="text-[#FF3C2F] text-4xl font-bold mb-6">What Our Users Say</h2>
-          <div className="flex flex-col md:flex-row gap-8">
-            <div className="bg-[#2A2A2A] text-[#FFFFFF] p-6 rounded-lg shadow-md flex-1">
-              <p className="mb-4">"Godrej AI Summarizer has revolutionized my workflow. It's fast, efficient, and incredibly easy to use!"</p>
-              <p className="font-semibold">- Alex Johnson</p>
-            </div>
-            <div className="bg-[#2A2A2A] text-[#FFFFFF] p-6 rounded-lg shadow-md flex-1">
-              <p className="mb-4">"The personalized summaries are a game-changer. I get exactly what I need without sifting through endless articles."</p>
-              <p className="font-semibold">- Jamie Lee</p>
-            </div>
-            <div className="bg-[#2A2A2A] text-[#FFFFFF] p-6 rounded-lg shadow-md flex-1">
-              <p className="mb-4">"An exceptional tool for anyone who needs quick and accurate information. Highly recommended!"</p>
-              <p className="font-semibold">- Taylor Smith</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Call to Action Section */}
       <div className="bg-[#FF3C2F] text-center py-12 mt-12">
         <h2 className="text-4xl font-bold mb-6 text-[#FFFFFF]">Ready to Experience the Future of Information?</h2>

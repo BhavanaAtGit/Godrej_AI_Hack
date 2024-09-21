@@ -46,7 +46,7 @@ export default function Admin() {
       setIsLoadingTopics(true);
       const fetchTrendingTopics = async () => {
         try {
-          const response = await axios.post('http://localhost:5000/api/trending', { interests: user.interests });
+          const response = await axios.post('https://godrej-ai-hack.onrender.com/api/trending', { interests: user.interests });
           setTrendingTopics(response.data.trending_topics);
         } catch (error) {
           console.error("Error fetching trending topics: ", error);

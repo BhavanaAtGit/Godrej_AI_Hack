@@ -11,7 +11,7 @@ export default function TrendingTopics() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/trending', {
+      const response = await fetch('https://godrej-ai-hack.onrender.com/api/trending', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
